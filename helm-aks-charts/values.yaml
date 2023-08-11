@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: registrycontainer13.azurecr.io/shakirmir/docker-spring-boot:56
+  repository: registrycontainer13.azurecr.io/shakirmir/docker-spring-boot:59
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
