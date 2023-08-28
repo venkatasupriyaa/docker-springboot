@@ -6,9 +6,9 @@ replicaCount: 1
 
 image:
   repository: myacrrepo31new.azurecr.io
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "V1"
 
 imagePullSecrets: []
 nameOverride: ""
