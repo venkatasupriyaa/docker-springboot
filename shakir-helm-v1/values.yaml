@@ -5,7 +5,11 @@
 replicaCount: 1
 
 image:
+<<<<<<< HEAD:shakir-helm-v1/values.yaml
   repository:shakirdocker/docker-image-build-push
+=======
+  repository: shakirdocker/docker-image-build-push
+>>>>>>> dbc0a9877dfc5d2ca1c4cc8a8bee0171283383e2:shakir-helm/values.yaml
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
