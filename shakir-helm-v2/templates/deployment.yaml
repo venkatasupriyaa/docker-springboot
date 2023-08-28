@@ -20,10 +20,11 @@ spec:
       labels:
         {{- include "shakir-helm-v2.selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      containers:
+    - name: my-container
+      image: shakirdocker/docker-image-build-push
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+       - name: dockerhub-secret
       serviceAccountName: {{ include "shakir-helm-v2.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
