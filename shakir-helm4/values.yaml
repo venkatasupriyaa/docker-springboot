@@ -8,7 +8,7 @@ image:
   repository: myacrrepo31new.azurecr.io
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "V1"
+  tag: ""
 
 imagePullSecrets: []
 nameOverride: ""
