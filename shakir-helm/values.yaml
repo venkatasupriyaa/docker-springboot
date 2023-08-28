@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: shakirdocker/docker-spring-boot
+  repository: docker.io/shakirmir/docker-spring-boot
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
