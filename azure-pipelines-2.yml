@@ -1,29 +1,42 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
-- master
-
-pool:
-  vmImage: ubuntu-latest
-
-- task: Maven@4
-  inputs:
-    mavenPomFile: 'pom.xml'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    javaHomeOption: 'JDKVersion'
-    mavenVersionOption: 'Default'
-    mavenAuthenticateFeed: false
-    effectivePomSkip: false
-    sonarQubeRunAnalysis: false
+- master  # You can adjust this to match your branch
 
 
-- task: Docker@2
-  inputs:
-    containerRegistry: 'mydockersvcsonar'
-    repository: 'shakirdocker/mysonarquberepo'
-    command: 'buildAndPush'
-    Dockerfile: '**/Dockerfile'
+jobs:
+- job: BuildAndDeploy
+  displayName: 'Build and Deploy to AKS'
+  pool:
+    vmImage: 'ubuntu-latest'
+
+  steps:
+  - task: UseJavaVersion@0
+    inputs:
+      javaHomeOption: 'JDKVersion'  # Specify the desired Java version
+
+  - script: 'mvn clean install'
+    displayName: 'Maven Build'
+
+  - task: SonarQubePrepare@4
+    inputs:
+      SonarQube: 'mysonarsvc'  # Configure your SonarQube service connection
+      scannerMode: 'CLI'
+      projectKey: 'sonarqubeprojectkey'
+      projectName: 'mysonarqube'
+      extraProperties: |
+        sonar.java.source=11  # Specify your Java version
+
+  - script: 'mvn sonar:sonar'
+    displayName: 'Run SonarQube Analysis'
+
+  - task: Docker@2
+    inputs:
+      containerRegistry: 'mydockersvcsonar'  # Configure your DockerHub service connection
+      repository: 'shakirdocker/mysonarquberepo'
+      command: 'buildAndPush'
+      Dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+      tags: 'latest'
+
+  - script: |
+      kubectl apply -f kubernetes/deployment.yaml  # Apply your Kubernetes deployment YAML
+      kubectl apply -f kubernetes/service.yaml     # Apply your Kubernetes service YAML
+    displayName: 'Deploy to AKS'
