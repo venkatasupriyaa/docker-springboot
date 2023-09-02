@@ -22,7 +22,7 @@ steps:
 
 - task: SonarQubePrepare@4
   inputs:
-    SonarQube: 'Your-SonarQube-Service-Endpoint-Name'
+    SonarQube: 'mysonarsvc'
 
 - task: SonarQubeAnalyze@4
 
@@ -32,7 +32,7 @@ steps:
 - task: Docker@2
   inputs:
     containerRegistry: 'Docker-Hub-Service-Connection-Name'
-    repository: 'your-dockerhub-repo-name'
+    repository: 'mysonarquberepo'
     command: 'buildAndPush'
     Dockerfile: '**/Dockerfile'
     tags: 'latest'
