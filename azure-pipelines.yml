@@ -1,59 +1,57 @@
 trigger:
-- master
+- master  # Define the branch to trigger the pipeline
 
-
+pr:
+- '*'  # Build pull requests from all branches
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'ubuntu-latest'  # Use a suitable agent image
+
+variables:
+  # Define variables for your Azure and Docker Hub resources
+  azureSubscription: 'Visual Studio Enterprise Subscription – MPN'  # Azure Service Connection name
+ # azureResourceGroup: 'YourResourceGroup'  # Azure Resource Group where AKS is located
+ # aksClusterName: 'YourAKSClusterName'  # Name of your AKS cluster
+  dockerHubRegistry: 'shakirdocker'  # Docker Hub username
+  dockerHubPassword: $(DOCKERHUB_PASSWORD)  # Docker Hub password variable (set as a secret in your pipeline)
+  dockerImageName: 'shakirdocker/mysonarquberepo'  # Name of your Docker image
 
 stages:
 - stage: Build
-  displayName: 'Build and Push Docker Image'
   jobs:
-  - job: BuildJob
+  - job: BuildAndPush
+    displayName: 'Build and Push Docker Image'
     steps:
     - task: UseJavaVersion@0
       inputs:
-        version: '13' # Set the Java version you need
+        version: '1.11'  # Choose your Java version
+        jdkArchitectureOption: 'x64'
+        addToPath: true
 
-    - script: echo 'Starting Maven build'
-      displayName: 'Maven Build'
-      workingDirectory: $(System.DefaultWorkingDirectory)
-
-    - script: mvn clean install -DskipTests=true
-      displayName: 'Maven Package'
-      workingDirectory: $(System.DefaultWorkingDirectory)
-
-    - script: echo 'Running SonarQube analysis'
-      displayName: 'SonarQube Analysis'
-      workingDirectory: $(System.DefaultWorkingDirectory)
+    - script: |
+        # Build your Java application using Maven
+        mvn clean install  # Replace with your Maven build command
+      displayName: 'Build Java App with Maven'
 
     - task: SonarQubePrepare@4
       inputs:
-        SonarQube: 'mydockersvcsonar' # Replace with your SonarQube service connection
-
-    - task: SonarQubeAnalyze@4
-
-    - script: echo 'Building Docker image'
-      displayName: 'Docker Build'
-      workingDirectory: $(System.DefaultWorkingDirectory)
-
-    - task: Docker@2
-      inputs:
-        containerRegistry: 'mydockersvcsonar' # Replace with your Docker Hub service connection
-        repository: 'mysonarsvc'
-        command: 'build'
-        Dockerfile: '**/Dockerfile'
-        tags: 'latest'
-
-    - script: echo 'Pushing Docker image to Docker Hub'
-      displayName: 'Docker Push'
-      workingDirectory: $(System.DefaultWorkingDirectory)
+        SonarQube: 'mysonarsvc'  # Name of your SonarQube service connection
+        scannerMode: 'CLI'
+        configMode: 'manual'
+        cliProjectKey: 'sonarqubeprojectkey'
+        cliProjectName: 'mysonarqube'
+        cliSources: '$(Build.SourcesDirectory)'
+        extraProperties: |
+          sonar.java.source=1.8
+          sonar.java.binaries=target/classes
 
     - task: Docker@2
       inputs:
-        containerRegistry: 'shakirdocker'
-        repository: 'shakirdocker/mysonarquberepo'
-        command: 'push'
-        Dockerfile: '**/Dockerfile'
-        tags: 'latest'
+        containerRegistryType: 'Container Registry'
+        dockerRegistryEndpoint: 'mydockersvcsonar'  # Azure DevOps service connection to Docker Hub
+        dockerFile: 'Dockerfile'  # Path to your Dockerfile
+        buildContext: '$(Build.SourcesDirectory)'
+        imageName: $(dockerImageName)
+        includeLatestTag: true
+        containerCommand: 'buildAndPush'
+        arguments: '-t $(dockerImageName):$(Build.BuildId)'
