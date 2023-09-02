@@ -22,11 +22,11 @@ stages:
   - job: BuildAndPush
     displayName: 'Build and Push Docker Image'
     steps:
-    - task: UseJavaVersion@0
-      inputs:
-        version: '1.11'  # Choose your Java version
-        jdkArchitectureOption: 'x64'
-        addToPath: true
+ - task: JavaToolInstaller@0
+  inputs:
+    versionSpec: '13'
+    jdkArchitectureOption: 'x64'
+    jdkSourceOption: 'PreInstalled'
 
     - script: |
         # Build your Java application using Maven
