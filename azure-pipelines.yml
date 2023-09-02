@@ -14,7 +14,7 @@ stages:
     steps:
     - task: UseJavaVersion@0
       inputs:
-        version: '11' # Set the Java version you need
+        version: '13' # Set the Java version you need
 
     - script: echo 'Starting Maven build'
       displayName: 'Maven Build'
