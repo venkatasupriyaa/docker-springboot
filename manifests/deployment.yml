@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: shakirmirdockerspringboot 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shakirmirdockerspringboot
+  template:
+    metadata:
+      labels:
+        app: shakirmirdockerspringboot 
+    spec:
+      containers:
+        - name: shakirmirdockerspringboot 
+          image: testconreg12.azurecr.io/shakirmirdockerspringboot
+          ports:
+          - containerPort: 80
