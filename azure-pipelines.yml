@@ -10,4 +10,4 @@ steps:
     mavensettingsfile: 'settings.xml'  # Path to your Maven settings.xml file
     publishmavenartifacts: false
     mavenPomFile: 'pom.xml'  # Path to your Maven project POM file
-    goals: 'clean install'
+    goals: 'clean install package'
