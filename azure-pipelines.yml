@@ -4,10 +4,38 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+
+
 steps:
-- task: MavenAuthenticate@0
+- script: echo 'Starting Maven build'
+  displayName: 'Maven Build'
+
+- task: Maven@3
   inputs:
-    mavensettingsfile: 'settings.xml'  # Path to your Maven settings.xml file
-    publishmavenartifacts: false
-    mavenPomFile: 'pom.xml'  # Path to your Maven project POM file
-    goals: 'clean install package'
+    mavenPomFile: 'pom.xml'
+    goals: 'clean install'
+    publishJUnitResults: true
+    testResultsFiles: '**/surefire-reports/TEST-*.xml'
+
+- script: echo 'Running SonarQube analysis'
+  displayName: 'SonarQube Analysis'
+
+- task: SonarQubePrepare@4
+  inputs:
+    SonarQube: 'Your-SonarQube-Service-Endpoint-Name'
+
+- task: SonarQubeAnalyze@4
+
+- script: echo 'Building and Pushing Docker image'
+  displayName: 'Docker Build & Push'
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'Docker-Hub-Service-Connection-Name'
+    repository: 'your-dockerhub-repo-name'
+    command: 'buildAndPush'
+    Dockerfile: '**/Dockerfile'
+    tags: 'latest'
+
+- script: echo 'Build completed!'
+  displayName: 'Build Completed'
