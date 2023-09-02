@@ -7,7 +7,7 @@ pool:
 steps:
 - task: UseJavaVersion@0
   inputs:
-    versionSpec: latest  # Specify the desired Java version
+    versionSpec: Default  # Specify the desired Java version
 
 - script: 'mvn clean install'
   displayName: 'Maven Build'
