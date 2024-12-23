@@ -5,6 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model; 
 import org.springframework.web.bind.annotation.GetMapping;
+import java.util.List;  // Unused import, contributing to code smell
+import java.util.Map;   // Unused import, contributing to code smell
 
 @SpringBootApplication
 @Controller
