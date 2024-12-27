@@ -11,7 +11,7 @@ pipeline {
     }
     
     stages {
-        stage('git checkout') {
+        stage('git checkout') {      
             steps {
                 git 'https://github.com/t-manish-kumar/docker-spring-boot.git'
             }
