@@ -1,50 +1,68 @@
 pipeline {
     agent any
-
+    
+    tools {
+        maven 'Maven3'
+    }
+    
     environment {
-        registry = "211223789150.dkr.ecr.us-east-1.amazonaws.com/my-docker-repo"
+        registry = "651706745449.dkr.ecr.us-east-1.amazonaws.com/myrepo"
+        SONARQUBE_SERVER = 'sonarqube' // Replace with your SonarQube server name
     }
+    
     stages {
-        stage('Checkout') {
+        stage('git checkout') {
             steps {
-                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/akannan1087/docker-spring-boot']])
+                git 'https://github.com/t-manish-kumar/docker-spring-boot.git'
             }
         }
         
-        stage ("Build JAR") {
-            steps {
-                sh "mvn clean install"
-            }
-        }
-        
-        stage ("Build Image") {
+       stage('building and SonarQube Analysis') {
             steps {
                 script {
-                    docker.build registry
+                    // This will set up SonarQube environment for the analysis
+                    withSonarQubeEnv('sonarqube') {
+                        sh 'mvn clean install sonar:sonar -Dsonar.login=squ_346794c2c8bb893795b222038f2175bfebead60f'
+                    }
                 }
             }
         }
         
-        stage ("Push to ECR") {
+        stage('Quality Gate') {
             steps {
                 script {
-                    sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 211223789150.dkr.ecr.us-east-1.amazonaws.com"
-                    sh "docker push 211223789150.dkr.ecr.us-east-1.amazonaws.com/my-docker-repo:latest"
-                    
+                    def qg = waitForQualityGate()
+                    if (qg.status != 'OK') {
+                        error "Pipeline failed due to quality gate failure: ${qg.status}"
+                    }
                 }
             }
         }
+
         
-        stage ("Helm package") {
-            steps {
-                    sh "helm package springboot"
-                }
-            }
-                
-        stage ("Helm install") {
-            steps {
-                    sh "helm upgrade myrelease-21 springboot-0.1.0.tgz"
-                }
-            }
+        stage('Building image') {
+        steps{
+           script {
+            dockerImage = docker.build registry 
+            dockerImage.tag("$BUILD_NUMBER")
+             }
+          }
+       }
+        
+    stage('Pushing to ECR') {
+     steps{  
+         script {
+                sh 'aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 651706745449.dkr.ecr.us-east-1.amazonaws.com'
+                sh 'docker push 651706745449.dkr.ecr.us-east-1.amazonaws.com/myrepo:$BUILD_NUMBER'
+         }
+        }
     }
+      
+     stage('Helm Deploy') {
+            steps {
+                 sh "helm upgrade first --install mychart --namespace helm-deployment --set image.tag=$BUILD_NUMBER"
+             }
+      }
+  
+  }
 }
