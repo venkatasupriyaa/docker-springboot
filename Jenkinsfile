@@ -6,14 +6,14 @@ pipeline {
     }
     
     environment {
-        registry = "651706745449.dkr.ecr.us-east-1.amazonaws.com/myrepo"
+        registry = "615299729731.dkr.ecr.us-east-1.amazonaws.com/my_repo"
         SONARQUBE_SERVER = 'sonarqube' // Replace with your SonarQube server name
     }
     
     stages {
         stage('git checkout') {      
             steps {
-                git 'https://github.com/t-manish-kumar/docker-spring-boot.git'
+                git 'https://github.com/venkatasupriyaa/docker-springboot.git'
             }
         }
         
@@ -52,8 +52,8 @@ pipeline {
     stage('Pushing to ECR') {
      steps{  
          script {
-                sh 'aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 651706745449.dkr.ecr.us-east-1.amazonaws.com'
-                sh 'docker push 651706745449.dkr.ecr.us-east-1.amazonaws.com/myrepo:$BUILD_NUMBER'
+                sh 'aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 615299729731.dkr.ecr.us-east-1.amazonaws.com'
+                sh 'docker push 615299729731.dkr.ecr.us-east-1.amazonaws.com/myrepo:$BUILD_NUMBER'
          }
         }
     }
