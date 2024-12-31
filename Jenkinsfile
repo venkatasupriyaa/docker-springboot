@@ -13,7 +13,7 @@ pipeline {
     stages {
         stage('git checkout') {      
             steps {
-                git 'https://github.com/venkatasupriyaa/docker-springboot.git'
+                git 'https://github.com/venkatasupriyaa/docker-springboot'
             }
         }
         
@@ -53,7 +53,7 @@ pipeline {
      steps{  
          script {
                 sh 'aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 615299729731.dkr.ecr.us-east-1.amazonaws.com'
-                sh 'docker push 615299729731.dkr.ecr.us-east-1.amazonaws.com/myrepo:$BUILD_NUMBER'
+                sh 'docker push 615299729731.dkr.ecr.us-east-1.amazonaws.com/my_repo:$BUILD_NUMBER'
          }
         }
     }
