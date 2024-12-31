@@ -7,7 +7,7 @@ pipeline {
     
     environment {
         registry = "615299729731.dkr.ecr.us-east-1.amazonaws.com/my_repo"
-        SONARQUBE_SERVER = 'sonarqube' // Replace with your SonarQube server name
+        SONARQUBE_SERVER = 'SonarQube' // Replace with your SonarQube server name
     }
     
     stages {
@@ -21,8 +21,8 @@ pipeline {
             steps {
                 script {
                     // This will set up SonarQube environment for the analysis
-                    withSonarQubeEnv('sonarqube') {
-                        sh 'mvn clean install sonar:sonar -Dsonar.login=squ_346794c2c8bb893795b222038f2175bfebead60f'
+                    withSonarQubeEnv('SonarQube') {
+                        sh 'mvn clean install sonar:sonar -Dsonar.login=sqa_e91d70f421d493ef798e86ea08449ab3d3953c32'
                     }
                 }
             }
